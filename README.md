@@ -122,5 +122,3 @@ yarn test
 
 Xoli Nxiweni - xoli-nxiweni@gmail.com
 
-Download APK: To be deployed
-
