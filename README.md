@@ -31,7 +31,7 @@ This mobile application is an image gallery that allows users to capture, store,
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/Xoli-Nxiweni/PhotosApp.git
+   git clone https://github.com/Xoli-Nxiweni/GalleryApp.git
    cd PhotosApp
    ```
 
