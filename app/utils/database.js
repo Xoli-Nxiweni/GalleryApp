@@ -19,9 +19,8 @@ export const initDatabase = async () => {
         timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
       )`
     );
-    console.log('✅ Database initialized');
   } catch (error) {
-    console.error('❌ Error initializing database:', error);
+    console.error('Error initializing database:', error);
     throw error;
   }
 };
@@ -34,10 +33,9 @@ export const saveImage = async (uri, latitude, longitude) => {
       'INSERT INTO images (uri, latitude, longitude, location) VALUES (?, ?, ?, ?)',
       [uri, latitude, longitude, locationName]
     );
-    console.log('✅ Image saved with location:', result);
     return result;
   } catch (error) {
-    console.error('❌ Error saving image:', error);
+    console.error('Error saving image:', error);
     throw error;
   }
 };
@@ -48,10 +46,9 @@ export const getAllImages = async () => {
     const result = await (await db).getAllAsync(
       'SELECT * FROM images ORDER BY timestamp DESC'
     );
-    console.log('✅ Images retrieved:', result);
     return result;
   } catch (error) {
-    console.error('❌ Error retrieving images:', error);
+    console.error('Error retrieving images:', error);
     throw error;
   }
 };
@@ -66,7 +63,7 @@ export const deleteImage = async (imageId) => {
     );
 
     if (!imageToDelete) {
-      console.error('❌ Image not found');
+      console.error('Image not found');
       return false;
     }
 
@@ -75,8 +72,7 @@ export const deleteImage = async (imageId) => {
       try {
         await FileSystem.deleteAsync(imageToDelete.uri, { idempotent: true });
       } catch (fileDeleteError) {
-        console.error('❌ Error deleting file:', fileDeleteError);
-        // Continue with database deletion even if file deletion fails
+        console.error('Error deleting file:', fileDeleteError);
       }
     }
 
@@ -86,10 +82,9 @@ export const deleteImage = async (imageId) => {
       [imageId]
     );
 
-    console.log('✅ Image deleted:', result);
     return true;
   } catch (error) {
-    console.error('❌ Error deleting image:', error);
+    console.error('Error deleting image:', error);
     throw error;
   }
 };
@@ -102,10 +97,9 @@ export const updateImage = async (imageId, uri, latitude, longitude) => {
       'UPDATE images SET uri = ?, latitude = ?, longitude = ?, location = ? WHERE id = ?',
       [uri, latitude, longitude, locationName, imageId]
     );
-    console.log('✅ Image updated:', result);
     return result;
   } catch (error) {
-    console.error('❌ Error updating image:', error);
+    console.error('Error updating image:', error);
     throw error;
   }
 };
@@ -117,10 +111,9 @@ export const searchImagesByLocation = async (searchQuery) => {
       'SELECT * FROM images WHERE location LIKE ? ORDER BY timestamp DESC',
       [`%${searchQuery}%`]
     );
-    console.log('✅ Images retrieved for search:', result);
     return result;
   } catch (error) {
-    console.error('❌ Error searching images:', error);
+    console.error('Error searching images:', error);
     throw error;
   }
 };
@@ -132,10 +125,9 @@ export const searchImagesByDateRange = async (startDate, endDate) => {
       'SELECT * FROM images WHERE timestamp BETWEEN ? AND ? ORDER BY timestamp DESC',
       [startDate, endDate]
     );
-    console.log('✅ Images retrieved for date range:', result);
     return result;
   } catch (error) {
-    console.error('❌ Error searching images by date range:', error);
+    console.error('Error searching images by date range:', error);
     throw error;
   }
 };

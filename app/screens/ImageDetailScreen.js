@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { 
   View, 
@@ -12,10 +11,10 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Svg, { Path } from 'react-native-svg';
-import LocationMap from '../components/LocationMarker'
-import PlaceholderMap from '../components/MapComponent';
-import { COLORS } from '../theme/colors';
+import LocationMap from '../components/LocationMarker';
 import { deleteImage } from '../utils/database';
+import ImageViewer from 'react-native-image-zoom-viewer';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 const { width, height } = Dimensions.get('window');
 
@@ -25,28 +24,33 @@ const MoreInfoIcon = ({ onPress }) => (
     style={styles.moreInfoButton} 
     onPress={onPress}
   >
-    <Svg 
-      width="24" 
-      height="24" 
-      viewBox="0 0 24 24" 
-      fill="white"
-    >
-      <Path 
-        d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" 
-      />
-    </Svg>
+    <Ionicons name="information-circle-outline" size={24} color="white" />
   </TouchableOpacity>
 );
 
-export default function ImageDetailScreen({ route }) {
+export default function SingleImageViewer({ route }) {
   const { image } = route.params;
   const navigation = useNavigation();
-  const [isDetailsVisible, setIsDetailsVisible] = useState(false);
+  const [isFullScreen, setIsFullScreen] = useState(false);
 
   const handleDeleteImage = async () => {
+    // Create a detailed message for the alert box
+    const formattedLocation = image.latitude && image.longitude 
+      ? `Latitude: ${image.latitude.toFixed(4)}, Longitude: ${image.longitude.toFixed(4)}`
+      : 'Location data not available';
+    
+    const formattedTimestamp = new Date(image.timestamp).toLocaleString();
+    const imageSize = image.size ? `${(image.size / (1024 * 1024)).toFixed(2)} MB` : 'Unknown';
+
+    const imageDetails = `
+      Location: ${formattedLocation}
+      Taken on: ${formattedTimestamp}
+      Size: ${imageSize}
+    `;
+
     Alert.alert(
       'Delete Image',
-      'Are you sure you want to delete this image?',
+      `Are you sure you want to delete this image?\n\nDetails:\n${imageDetails}`,
       [
         {
           text: 'Cancel',
@@ -81,74 +85,73 @@ export default function ImageDetailScreen({ route }) {
     );
   };
 
-  const toggleDetailsVisibility = () => {
-    setIsDetailsVisible(!isDetailsVisible);
+  const toggleFullScreen = () => {
+    setIsFullScreen(!isFullScreen);
   };
 
   return (
     <View style={styles.container}>
-      {/* Display the image */}
-      <Image 
-        source={{ uri: image.uri }} 
-        style={styles.fullScreenImage}
-        resizeMode="contain"
-      />
+      {/* Image Container */}
+      <View style={styles.imageContainer}>
+        <TouchableOpacity onPress={toggleFullScreen}>
+          <Image 
+            source={{ uri: image.uri }} 
+            style={styles.image}
+            resizeMode="contain"
+          />
+        </TouchableOpacity>
+      </View>
 
       {/* Delete Button */}
       <TouchableOpacity 
         style={styles.deleteButton} 
         onPress={handleDeleteImage}
       >
-        <Text style={styles.deleteButtonText}>🗑️ Delete Image</Text>
+        <Ionicons name="trash-bin-outline" size={24} color="white" />
       </TouchableOpacity>
 
-      {/* More Info Icon */}
-      {(image.latitude && image.longitude) && (
-        <MoreInfoIcon onPress={toggleDetailsVisibility} />
-      )}
+      {/* More Info Button */}
+      <MoreInfoIcon onPress={() => alert('More Info Pressed')} />
 
-      {/* Location Details Modal */}
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={isDetailsVisible}
-        onRequestClose={toggleDetailsVisibility}
-      >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <TouchableOpacity 
-              style={styles.closeButton} 
-              onPress={toggleDetailsVisibility}
-            >
-              <Text style={styles.closeButtonText}>×</Text>
-            </TouchableOpacity>
+      {/* Image Details Section */}
+      <View style={styles.detailsContainer}>
+        <Text style={styles.modalTitle}>Image Details</Text>
+        
+        {/* Location Details */}
+        {image.latitude && image.longitude && (
+          <>
+            <View style={styles.locationContainer}>
+              <Text style={styles.locationText}>
+                Latitude: {image.latitude.toFixed(4)}
+              </Text>
+              <Text style={styles.locationText}>
+                Longitude: {image.longitude.toFixed(4)}
+              </Text>
+            </View>
 
-            <Text style={styles.modalTitle}>Location Details</Text>
-            
-            {image.latitude && image.longitude && (
-              <>
-                <View style={styles.locationContainer}>
-                  <Text style={styles.locationText}>
-                    Latitude: {image.latitude.toFixed(4)}
-                  </Text>
-                  <Text style={styles.locationText}>
-                    Longitude: {image.longitude.toFixed(4)}
-                  </Text>
-                </View>
+            <LocationMap
+              latitude={image.latitude} 
+              longitude={image.longitude} 
+              style={styles.modalMap}
+            />
+          </>
+        )}
 
-                <LocationMap
-                  latitude={image.latitude} 
-                  longitude={image.longitude} 
-                  style={styles.modalMap}
-                />
-              </>
-            )}
+        {/* Timestamp */}
+        <Text style={styles.timestampText}>
+          Taken on: {new Date(image.timestamp).toLocaleString()}
+        </Text>
+      </View>
 
-            <Text style={styles.timestampText}>
-              Taken on: {new Date(image.timestamp).toLocaleString()}
-            </Text>
-          </View>
-        </View>
+      {/* Full Screen Image Viewer */}
+      <Modal visible={isFullScreen} transparent={true} onRequestClose={toggleFullScreen}>
+        <ImageViewer 
+          imageUrls={[{ url: image.uri }]}
+          enableSwipeDown={true}
+          onSwipeDown={toggleFullScreen}
+          saveToLocalByLongPress={false}
+          backgroundColor="black"
+        />
       </Modal>
     </View>
   );
@@ -157,80 +160,81 @@ export default function ImageDetailScreen({ route }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.BACKGROUND_DARK,
+    backgroundColor: '#121212',
   },
-  fullScreenImage: {
-    width: width,
-    height: height * 0.6,
-  },
-  deleteButton: {
-    position: 'absolute',
-    top: 10,
-    right: 10,
-    backgroundColor: COLORS.ACCENT_RED,
-    padding: 10,
-    borderRadius: 5,
-    zIndex: 10,
-  },
-  deleteButtonText: {
-    color: COLORS.TEXT_WHITE,
-    fontWeight: 'bold',
-  },
-  moreInfoButton: {
-    position: 'absolute',
-    bottom: 20,
-    right: 20,
-    backgroundColor: COLORS.ACCENT_BLUE,
-    borderRadius: 30,
-    padding: 10,
-    zIndex: 10,
-  },
-  modalContainer: {
+  imageContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    marginTop: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#333',
+    marginBottom: 15,
   },
-  modalContent: {
-    width: width * 0.9,
-    backgroundColor: COLORS.BACKGROUND_DARK,
-    borderRadius: 20,
-    padding: 20,
-    alignItems: 'center',
+  image: {
+    width: width - 40,
+    height: height * 0.5,
+    borderRadius: 15,
+    borderWidth: 2,
+    borderColor: '#fff',
   },
-  closeButton: {
+  deleteButton: {
     position: 'absolute',
-    top: 10,
-    right: 10,
+    top: 30,
+    right: 20,
+    backgroundColor: '#ff4747',
+    padding: 10,
+    borderRadius: 30,
+    zIndex: 10,
   },
-  closeButtonText: {
-    fontSize: 30,
-    color: COLORS.TEXT_WHITE,
+  moreInfoButton: {
+    position: 'absolute',
+    top: 30,
+    left: 20,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    padding: 10,
+    borderRadius: 25,
+    zIndex: 10,
+  },
+  deleteButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 24,
+  },
+  detailsContainer: {
+    backgroundColor: 'rgba(0, 0, 0, 0.85)',
+    padding: 20,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    marginTop: 15,
+    marginBottom: 20,
   },
   modalTitle: {
-    fontSize: 20,
-    color: COLORS.TEXT_WHITE,
-    marginBottom: 15,
+    fontSize: 22,
+    color: '#fff',
+    marginBottom: 10,
+    textAlign: 'center',
   },
   locationContainer: {
-    backgroundColor: COLORS.ACCENT_BLUE,
-    padding: 10,
+    backgroundColor: '#333',
+    padding: 15,
     borderRadius: 10,
-    marginBottom: 15,
+    marginBottom: 20,
   },
   locationText: {
-    color: COLORS.TEXT_WHITE,
+    color: 'white',
     fontSize: 16,
     textAlign: 'center',
   },
   modalMap: {
-    width: width * 0.8,
-    height: 200,
+    width: width * 0.9,
+    height: 250,
     borderRadius: 10,
-    marginBottom: 15,
+    marginBottom: 20,
   },
   timestampText: {
-    color: COLORS.TEXT_LIGHT_BLUE,
+    color: '#fff',
     fontSize: 14,
+    textAlign: 'center',
   },
 });

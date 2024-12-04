@@ -7,6 +7,7 @@ import { COLORS } from '../theme/colors';
 import GalleryScreen from '../screens/GalleryScreen';
 import CameraScreen from '../screens/CameraScreen';
 import ImageDetailScreen from '../screens/ImageDetailScreen';
+import SplashScreen from '../screens/SplashScreen';
 
 const Stack = createStackNavigator();
 
@@ -24,6 +25,12 @@ export default function AppNavigator() {
           }
         }}
       >
+        {/* Splash Screen */}
+        <Stack.Screen 
+          name="Splash" 
+          component={SplashScreen} 
+          options={{ headerShown: false }} 
+        />
         {/* Gallery Screen */}
         <Stack.Screen 
           name="Gallery" 
@@ -34,7 +41,7 @@ export default function AppNavigator() {
         {/* Camera Screen */}
         <Stack.Screen 
           name="Camera" 
-          options={{ title: 'Take Photo' }}
+          options={{ headerShown: false }}
           component={CameraScreen} 
         />
         

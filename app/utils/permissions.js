@@ -25,7 +25,6 @@ export const getCurrentLocation = async () => {
     }
 
     const location = await Location.getCurrentPositionAsync({});
-    console.log('Current location:', location);
 
     return {
       latitude: location.coords.latitude,
