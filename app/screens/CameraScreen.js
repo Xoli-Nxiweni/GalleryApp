@@ -1,32 +1,27 @@
 import React, { useState, useRef } from 'react';
-import { 
-  View, 
-  TouchableOpacity, 
-  StyleSheet, 
+import {
+  View,
+  TouchableOpacity,
+  StyleSheet,
   Alert,
-  Text
+  Text,
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { MaterialIcons } from '@expo/vector-icons';
 import { COLORS } from '../theme/colors';
-import { 
-  getCurrentLocation, 
-  getLocationName
+import {
+  getCurrentLocation,
+  getLocationName,
 } from '../utils/permissions';
 import { saveImage } from '../utils/database';
 
 export default function CameraScreen({ navigation }) {
-  // Use the new useCameraPermissions hook
   const [permission, requestPermission] = useCameraPermissions();
-  
-  // Use 'back' or 'front' instead of Camera.Constants.Type
   const [facing, setFacing] = useState('back');
-  
-  // Use React.useRef for camera reference
   const cameraRef = useRef(null);
 
-  // Permission handling
+  // Handle camera permissions
   if (!permission) {
     // Camera permissions are still loading
     return <View />;
@@ -38,7 +33,7 @@ export default function CameraScreen({ navigation }) {
       <View style={styles.container}>
         <Text style={styles.message}>We need your permission to show the camera</Text>
         <TouchableOpacity onPress={requestPermission} style={styles.permissionButton}>
-          <Text>Grant Permission</Text>
+          <Text style={styles.permissionButtonText}>Grant Permission</Text>
         </TouchableOpacity>
       </View>
     );
@@ -107,8 +102,8 @@ export default function CameraScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <CameraView 
-        style={styles.camera} 
+      <CameraView
+        style={styles.camera}
         facing={facing}
         ref={cameraRef}
         mode="picture"
@@ -116,19 +111,21 @@ export default function CameraScreen({ navigation }) {
         <View style={styles.buttonContainer}>
           <TouchableOpacity
             style={styles.actionButton}
-            onPress={takePicture}
+            onPress={selectFromGallery}
           >
-            <MaterialIcons 
-              name="photo-camera" 
-              size={30} 
-              color="white" 
-            />
+          <MaterialIcons name="photo-library" size={30} color="white" />
+            
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.galleryButton}
-            onPress={selectFromGallery}
+            onPress={takePicture}
           >
-            <MaterialIcons name="photo-library" size={30} color="white" />
+            <MaterialIcons
+              name="photo-camera"
+              size={30}
+              color="white"
+            />
+            
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.flipButton}
@@ -145,57 +142,60 @@ export default function CameraScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.BACKGROUND_DARK
+    backgroundColor: COLORS.BACKGROUND_DARK,
   },
   camera: {
     flex: 1,
     justifyContent: 'flex-end',
-    alignItems: 'center'
+    alignItems: 'center',
   },
   buttonContainer: {
     flexDirection: 'row',
-    marginBottom: 20,
+    marginBottom: 15,
     backgroundColor: 'transparent',
-    alignItems: 'center'
+    alignItems: 'center',
+    width: '100%',
+    justifyContent: 'space-around',
   },
   actionButton: {
     width: 70,
     height: 70,
-    bottom: 0,
-    borderRadius: 50,
-    backgroundColor: COLORS.PRIMARY_BLUE,
+    borderRadius: 35,
+    backgroundColor: '#444',
     justifyContent: 'center',
     alignItems: 'center',
-    marginHorizontal: 10
+    marginHorizontal: 10,
   },
   galleryButton: {
     width: 70,
     height: 70,
-    bottom: 0,
-    borderRadius: 50,
-    backgroundColor: COLORS.SECONDARY_BLUE,
+    borderRadius: 35,
+    backgroundColor: '#444',
     justifyContent: 'center',
     alignItems: 'center',
-    marginHorizontal: 10
+    marginHorizontal: 10,
   },
   flipButton: {
     width: 70,
     height: 70,
-    bottom: 0,
-    borderRadius: 50,
-    backgroundColor: COLORS.ACCENT_COLOR,
+    borderRadius: 35,
+    backgroundColor: '#444',
     justifyContent: 'center',
     alignItems: 'center',
-    marginHorizontal: 10
+    marginHorizontal: 10,
   },
   message: {
     textAlign: 'center',
-    padding: 20
+    padding: 20,
+    color: COLORS.TEXT_LIGHT,
   },
   permissionButton: {
     alignSelf: 'center',
     backgroundColor: COLORS.PRIMARY_BLUE,
     padding: 10,
-    borderRadius: 5
-  }
+    borderRadius: 5,
+  },
+  permissionButtonText: {
+    color: COLORS.TEXT_LIGHT,
+  },
 });

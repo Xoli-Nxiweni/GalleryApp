@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { StatusBar } from 'react-native';
 import AppNavigator from './app/navigation/AppNavigator';
 import { initDatabase } from './app/utils/database';
-import { COLORS } from './app/theme/colors';
+import { DarkTheme } from '@react-navigation/native';
 
 export default function App() {
   useEffect(() => {
@@ -13,7 +13,7 @@ export default function App() {
     <>
       <StatusBar 
         barStyle="light-content" 
-        backgroundColor={COLORS.BACKGROUND_DARK} 
+        backgroundColor={DarkTheme.colors.background}
       />
       <AppNavigator />
     </>

@@ -13,13 +13,26 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.galleryapp",
+      "infoPlist": {
+        "NSCameraUsageDescription": "This app needs access to the camera to take photos.",
+        "NSMicrophoneUsageDescription": "This app needs access to the microphone for videos.",
+        "NSPhotoLibraryUsageDescription": "This app needs access to your photo library to save and access photos."
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.galleryapp",
+      "permissions": [
+        "CAMERA",
+        "RECORD_AUDIO",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -32,23 +45,37 @@
           "enableFTS": true,
           "useSQLCipher": true,
           "android": {
-            
             "enableFTS": false,
             "useSQLCipher": false
           },
           "ios": {
-            
-            "customBuildFlags": ["-DSQLITE_ENABLE_DBSTAT_VTAB=1 -DSQLITE_ENABLE_SNAPSHOT=1"]
+            "customBuildFlags": [
+              "-DSQLITE_ENABLE_DBSTAT_VTAB=1",
+              "-DSQLITE_ENABLE_SNAPSHOT=1"
+            ]
           }
         }
-      ], [
+      ],
+      [
         "expo-camera",
         {
-          "cameraPermission": "Allow $(Yo_Gallery) to access your camera",
-          "microphonePermission": "Allow $(Yo_Gallery) to access your microphone",
+          "cameraPermission": "Allow GalleryApp to access your camera",
+          "microphonePermission": "Allow GalleryApp to access your microphone",
           "recordAudioAndroid": true
         }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow GalleryApp to access your photos."
+        }
       ]
+    ],
+    "permissions": [
+      "CAMERA",
+      "RECORD_AUDIO",
+      "READ_EXTERNAL_STORAGE",
+      "WRITE_EXTERNAL_STORAGE"
     ]
   }
 }
